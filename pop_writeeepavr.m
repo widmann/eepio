@@ -168,7 +168,7 @@ switch Arg.fileVers
         writeriffchunk(fid, 'chan', EEG.nbchan * 2, int16(0:EEG.nbchan - 1));
 
         % Data chunk
-        epochOffsetArray = writeriffdata(fid, data, epochLength);
+        epochOffsetArray = writecntriffdata(fid, data, epochLength);
 
         % Epoch chunk
         writeriffchunk(fid, 'ep', length(epochOffsetArray) * 4 + 4, uint32([epochLength epochOffsetArray]));
@@ -183,7 +183,7 @@ switch Arg.fileVers
         writeriffchunk(fid, 'chan', EEG.nbchan * 2, int16(0:EEG.nbchan - 1));
 
         % Data chunk
-        epochOffsetArray = writeriffdata(fid, stdd, epochLength);
+        epochOffsetArray = writecntriffdata(fid, stdd, epochLength);
 
         % Epoch chunk
         writeriffchunk(fid, 'ep', length(epochOffsetArray) * 4 + 4, uint32([epochLength epochOffsetArray]));
@@ -192,7 +192,7 @@ switch Arg.fileVers
         writeriffchunksize(fid, rawOffset);
 
         % EEP header chunk
-        writeriffeeph(fid, EEG, true, Arg.condLabel, Arg.colorCode);
+        writecntriffeeph(fid, EEG, true, Arg.condLabel, Arg.colorCode);
 
         % RIFF size
         writeriffchunksize(fid, cntOffset);
