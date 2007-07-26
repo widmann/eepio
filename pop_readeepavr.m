@@ -84,7 +84,7 @@ end
 switch Arg.fileVers
 
     % EEP 2-3.2 (simple binary)
-    case 2
+    case {2 3}
 
         % Read global header
         fread(fid, 1, 'uint16'); % Global header size
@@ -109,6 +109,7 @@ switch Arg.fileVers
         % Read history
         histSize = chanOffsetArray(1) - ftell(fid);
         if histSize
+            Arg.fileVers = 3;
             EEG.history = fread(fid, [1 histSize], '*char');
             EEG.history = char(regexp(EEG.history, '\[History\]\n(.*)\nEOH\n', 'tokens', 'once'));
         end
