@@ -97,7 +97,7 @@ if ~isfield(Arg, 'fileVers') || isempty(Arg.fileVers)
     Arg.fileVers = 4;
 end
 if ~isfield(Arg, 'condLabel') || isempty(Arg.condLabel)
-    Arg.condLabel = EEG.setname;
+    Arg.condLabel = num2str(EEG.event(1).type);
 end
 if ~isfield(Arg, 'colorCode') || isempty(Arg.colorCode)
     Arg.colorCode = 16; % Blue
@@ -205,6 +205,7 @@ end
 % Close file
 fclose(fid);
 
+% History string
 if nargout > 0
     com = [fieldnames(Arg) struct2cell(Arg)]';
     com = ['pop_writeeepavr(' inputname(1) ', ' vararg2str(com(:)) ');'];
