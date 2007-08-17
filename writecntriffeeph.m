@@ -29,8 +29,13 @@ fprintf(fid, '[Samples]\n%d\n', EEG.pnts);
 fprintf(fid, '[Channels]\n%d\n', EEG.nbchan);
 fprintf(fid, '[Basic Channel Data]\n');
 fprintf(fid, ';label    calibration factor\n');
+if ~isfield(EEG.chanlocs, 'calib')
+    [EEG.chanlocs(:).calib] = deal(1);
+end
 for iChan = 1:EEG.nbchan
-    fprintf(fid, '%-010s %.10e %.10e uV\n', EEG.chanlocs(iChan).labels, 1, 1);
+    expn = floor(log10(abs(EEG.chanlocs(iChan).calib)));
+    mant = EEG.chanlocs(iChan).calib / 10^expn;
+    fprintf(fid, '%-010s 1.0000000000e+00 %.10fe%+03d uV\n', EEG.chanlocs(iChan).labels, mant, expn);
 end
 
 % EEP average header
