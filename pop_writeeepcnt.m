@@ -85,9 +85,9 @@ rawOffset = writeriffchunk(fid, 'LIST', [], 'raw3');
 writeriffchunk(fid, 'chan', EEG.nbchan * 2, int16(0:EEG.nbchan - 1));
 
 % Scale data
-calib = double(max(max(abs(EEG.data)))) / 2^31;
+calib = double(max(max(abs(EEG.data)))) / (2^31 - 1);
 calib = ceil(calib * 10^(10 - floor(log10(abs(calib))))) / 10^(10 - floor(log10(abs(calib))));
-data = int32(round(double(EEG.data) ./ calib));
+data = round(double(EEG.data) ./ calib);
 [EEG.chanlocs(:).calib] = deal(calib);
 
 % Data chunk
