@@ -14,7 +14,7 @@ switch Chunk.id
     case {'chan' 'data' 'ep' 'eeph'}
         readfunc = str2func(['readcntriff' lower(Chunk.id)]);
     otherwise
-        readfunc = @skip;
+        readfunc = @skipriffchunk;
 end
 
 % Read chunk
