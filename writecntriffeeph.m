@@ -35,7 +35,7 @@ end
 for iChan = 1:EEG.nbchan
     expn = floor(log10(abs(EEG.chanlocs(iChan).calib)));
     mant = EEG.chanlocs(iChan).calib / 10^expn;
-    fprintf(fid, '%-010s 1.0000000000e+00 %.10fe%+03d uV\n', EEG.chanlocs(iChan).labels, mant, expn);
+    fprintf(fid, '%-10s 1.0000000000e+00 %.10fe%+03d uV\n', EEG.chanlocs(iChan).labels, mant, expn);
 end
 
 % EEP average header
