@@ -1,6 +1,6 @@
-% $Id$
+% $Id: writecntriffeeph.m 17 2008-03-11 13:01:06Z widmann $
 
-function writeriffeeph(fid, EEG, isAvg, condLabel, colorCode)
+function writeriffeeph(fid, EEG, isAvg, condLabel, colorCode, nRej)
 
 if nargin < 2
     error('Not enough input arguments.')
@@ -41,7 +41,7 @@ end
 % EEP average header
 if isAvg
     fprintf(fid, '[Averaged Trials]\n%d\n', EEG.trials);
-    fprintf(fid, '[Total Trials]\n%d\n', EEG.trials);
+    fprintf(fid, '[Total Trials]\n%d\n', EEG.trials + nRej);
     fprintf(fid, '[Condition Label]\n%s\n', condLabel);
     fprintf(fid, '[Condition Color]\ncolor:%-2d\n', colorCode);
     fprintf(fid, '[Pre-stimulus]\n%.10f\n', -EEG.xmin);
