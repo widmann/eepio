@@ -9,11 +9,12 @@
 %   EEG        - EEGLAB EEG structure
 %
 % Optional inputs:
-%   'fileName'    - char array file name
-%   'fileVers'    - scalar integer file format version {default 4}
-%   'pathName'    - char array path name {default '.'}
-%   'condLabel'   - char array condition label {default EEG.setname}
-%   'colorCode'   - scalar integer or char array color code {default 16}
+%   'filename'    - char array file name
+%   'filevers'    - scalar integer file format version {default 4}
+%   'pathname'    - char array path name {default '.'}
+%   'condlabel'   - char array condition label {default EEG.setname}
+%   'colorcode'   - scalar integer or char array color code {default 16}
+%   'nrej'        - scalar integer number of rejected trials {default 0}
 %
 % Outputs:
 %   com           - history string
@@ -38,7 +39,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-% $Id$
+% $Id: pop_writeeepavr.m 4 2007-07-26 09:45:13Z widmann $
 
 function com = pop_writeeepavr(EEG, varargin)
 
@@ -64,20 +65,20 @@ if nargin < 2
     result = inputgui(uigeom, uilist, 'pophelp(''pop_writeeepavr'')', 'Write EEP .avr file -- pop_writeeepavr()');
     if isempty(result), return, end
 
-    Arg.fileVers = result{1} + 1;
-    Arg.condLabel = result{2};
+    Arg.filevers = result{1} + 1;
+    Arg.condlabel = result{2};
 
     % Color code
     temp = str2num(result{3});
     if ~isempty(temp)
-        Arg.colorCode = temp;
+        Arg.colorcode = temp;
     else
-        Arg.colorCode = result{3};
+        Arg.colorcode = result{3};
     end
 
     % File dialog
-    [Arg.fileName Arg.pathName] = uiputfile('*.avr');
-    if Arg.fileName == 0, return, end
+    [Arg.filename Arg.pathname] = uiputfile('*.avr');
+    if Arg.filename == 0, return, end
 
 % Command line mode
 else
@@ -85,24 +86,27 @@ else
 end
 
 % Argument check
-if ~isfield(Arg, 'fileName') || isempty(Arg.fileName)
+if ~isfield(Arg, 'filename') || isempty(Arg.filename)
     error('Not enough input arguments.')
 end
 
 % Defaults
-if ~isfield(Arg, 'pathName')
-    Arg.pathName = '.';
+if ~isfield(Arg, 'pathname')
+    Arg.pathname = '.';
 end
-if ~isfield(Arg, 'fileVers') || isempty(Arg.fileVers)
-    Arg.fileVers = 4;
+if ~isfield(Arg, 'filevers') || isempty(Arg.filevers)
+    Arg.filevers = 4;
 end
-if ~isfield(Arg, 'condLabel') || isempty(Arg.condLabel)
-    Arg.condLabel = num2str(EEG.event(1).type);
+if ~isfield(Arg, 'condlabel') || isempty(Arg.condlabel)
+    Arg.condlabel = num2str(EEG.event(1).type);
 end
-if ~isfield(Arg, 'colorCode') || isempty(Arg.colorCode)
-    Arg.colorCode = 16; % Blue
-elseif ischar(Arg.colorCode)
-    Arg.colorCode = eepcol(Arg.colorCode);
+if ~isfield(Arg, 'colorcode') || isempty(Arg.colorcode)
+    Arg.colorcode = 16; % Blue
+elseif ischar(Arg.colorcode)
+    Arg.colorcode = eepcol(Arg.colorcode);
+end
+if ~isfield(Arg, 'nrej') || isempty(Arg.nrej)
+    Arg.nrej = 0;
 end
 
 % Prepare data
@@ -111,12 +115,12 @@ data = mean(EEG.data, 3);
 epochLength = EEG.pnts;
 
 % Open file
-[fid message] = fopen(fullfile(Arg.pathName, Arg.fileName), 'w', 'l');
+[fid message] = fopen(fullfile(Arg.pathname, Arg.filename), 'w', 'l');
 if fid == -1
     error(message)
 end
 
-switch Arg.fileVers
+switch Arg.filevers
 
     % EEP 2-3.2
     case {2 3}
@@ -127,14 +131,14 @@ switch Arg.fileVers
         fwrite(fid, EEG.nbchan, 'uint16');
         fwrite(fid, EEG.pnts, 'uint16');
         fwrite(fid, EEG.trials, 'uint16');
-        fwrite(fid, 0, 'uint16'); % N rejected trials
+        fwrite(fid, Arg.nrej, 'uint16'); % N rejected trials
         fwrite(fid, EEG.xmin * 1000, 'float32');
         fwrite(fid, 1000 / EEG.srate, 'float32');
-        fprintf(fid, '%-10s', Arg.condLabel(1:min([end 10]))); % Condition label
-        fprintf(fid, 'color:%-2d', Arg.colorCode); % Color code
+        fprintf(fid, '%-10s', Arg.condlabel(1:min([end 10]))); % Condition label
+        fprintf(fid, 'color:%-2d', Arg.colorcode); % Color code
 
         % Prepare history
-        if Arg.fileVers > 2
+        if Arg.filevers > 2
             histArray = sprintf('[History]\n%s\nEOH\n', EEG.history);
         else
             histArray = '';
@@ -149,7 +153,7 @@ switch Arg.fileVers
 
         % Write history
         fprintf(fid, '%s', histArray);
-        
+
         % Write data
         for iChan = 1:EEG.nbchan
             fwrite(fid, [data(iChan, :) stdd(iChan, :)], 'float32');
@@ -192,7 +196,7 @@ switch Arg.fileVers
         writeriffchunksize(fid, rawOffset);
 
         % EEP header chunk
-        writecntriffeeph(fid, EEG, true, Arg.condLabel, Arg.colorCode);
+        writecntriffeeph(fid, EEG, true, Arg.condlabel, Arg.colorcode, Arg.nrej);
 
         % RIFF size
         writeriffchunksize(fid, cntOffset);
