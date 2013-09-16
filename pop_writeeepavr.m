@@ -110,7 +110,7 @@ if ~isfield(Arg, 'nrej') || isempty(Arg.nrej)
 end
 
 % Prepare data
-stdd = std(EEG.data, 0, 3);
+stdd = var(EEG.data, 1, 3);
 data = mean(EEG.data, 3);
 epochLength = EEG.pnts;
 
