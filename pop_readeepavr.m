@@ -6,8 +6,8 @@
 %                                   'keyn', valuen);
 %
 % Optional inputs:
-%   'fileName'    - char array file name
-%   'pathName'    - char array path name {default '.'}
+%   'filename'    - char array file name
+%   'pathname'    - char array path name {default '.'}
 %   'fileVers'    - scalar integer file format version {default 4}
 %
 % Outputs:
@@ -45,8 +45,8 @@ EEG = [];
 if nargin < 1
 
     % File dialog
-    [Arg.fileName Arg.pathName] = uigetfile('*.avr');
-    if Arg.fileName == 0, return, end
+    [Arg.filename Arg.pathname] = uigetfile('*.avr');
+    if Arg.filename == 0, return, end
 
 % Command line mode
 else
@@ -54,8 +54,8 @@ else
 end
 
 % Default pathname
-if ~isfield(Arg, 'pathName')
-    Arg.pathName = '.';
+if ~isfield(Arg, 'pathname')
+    Arg.pathname = '.';
 end
 
 % Empty EEG dataset
@@ -65,7 +65,7 @@ catch
 end
 
 % Open file
-[fid message] = fopen(fullfile(Arg.pathName, Arg.fileName), 'r', 'l');
+[fid message] = fopen(fullfile(Arg.pathname, Arg.filename), 'r', 'l');
 if fid == -1
     error(message)
 end
@@ -155,8 +155,8 @@ end
 % Close file
 fclose(fid);
 
-EEG.filename = Arg.fileName;
-EEG.filepath = Arg.pathName;
+EEG.filename = Arg.filename;
+EEG.filepath = Arg.pathname;
 EEG.trials = 1;
 EEG.xmax = EEG.xmin + (EEG.pnts - 1) / EEG.srate;
 EEG.times = (EEG.xmin + (0:EEG.pnts - 1) / EEG.srate) * 1000;
