@@ -103,14 +103,14 @@ end
 if ~isfield(Arg, 'colorcode') || isempty(Arg.colorcode)
     Arg.colorcode = 16; % Blue
 elseif ischar(Arg.colorcode)
-    Arg.colorcode = eepcol(Arg.colorcode);
+    Arg.colorcode = eepcol(Arg.colorcode);?
 end
 if ~isfield(Arg, 'nrej') || isempty(Arg.nrej)
     Arg.nrej = 0;
 end
 
 % Prepare data
-stdd = var(EEG.data, 1, 3);
+stdd = std(EEG.data, 1, 3);
 data = mean(EEG.data, 3);
 epochLength = EEG.pnts;
 
