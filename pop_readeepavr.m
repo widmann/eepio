@@ -2,7 +2,7 @@
 %
 % Usage:
 %   >> [EEG, com] = pop_readeepavr; % pop-up window mode
-%   >> [EEG, com] = pop_writeeepavr('key1', value1, 'key2', value2, ...
+%   >> [EEG, com] = pop_readeepavr('key1', value1, 'key2', value2, ...
 %                                   'keyn', valuen);
 %
 % Optional inputs:
