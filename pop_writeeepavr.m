@@ -77,7 +77,7 @@ if nargin < 2
     end
 
     % File dialog
-    [Arg.filename Arg.pathname] = uiputfile('*.avr');
+    [Arg.filename, Arg.pathname] = uiputfile('*.avr');
     if Arg.filename == 0, return, end
 
 % Command line mode
@@ -103,7 +103,7 @@ end
 if ~isfield(Arg, 'colorcode') || isempty(Arg.colorcode)
     Arg.colorcode = 16; % Blue
 elseif ischar(Arg.colorcode)
-    Arg.colorcode = eepcol(Arg.colorcode);?
+    Arg.colorcode = eepcol(Arg.colorcode);
 end
 if ~isfield(Arg, 'nrej') || isempty(Arg.nrej)
     Arg.nrej = 0;
@@ -115,7 +115,7 @@ data = mean(EEG.data, 3);
 epochLength = EEG.pnts;
 
 % Open file
-[fid message] = fopen(fullfile(Arg.pathname, Arg.filename), 'w', 'l');
+[fid, message] = fopen(fullfile(Arg.pathname, Arg.filename), 'w', 'l');
 if fid == -1
     error(message)
 end
