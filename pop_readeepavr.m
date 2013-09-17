@@ -9,6 +9,8 @@
 %   'filename'    - char array file name
 %   'pathname'    - char array path name {default '.'}
 %   'fileVers'    - scalar integer file format version {default 4}
+%   'readstdd'    - scalar boolean import stdd data (file format 4/RIFF
+%                   only) {default false}
 %
 % Outputs:
 %   EEG           - EEGLAB EEG structure
@@ -36,7 +38,7 @@
 
 % $Id$
 
-function [EEG com] = pop_readeepavr(varargin)
+function [EEG, com] = pop_readeepavr(varargin)
 
 com = '';
 EEG = [];
@@ -45,7 +47,7 @@ EEG = [];
 if nargin < 1
 
     % File dialog
-    [Arg.filename Arg.pathname] = uigetfile('*.avr');
+    [Arg.filename, Arg.pathname] = uigetfile('*.avr');
     if Arg.filename == 0, return, end
 
 % Command line mode
@@ -58,6 +60,11 @@ if ~isfield(Arg, 'pathname')
     Arg.pathname = '.';
 end
 
+% Read stdd data from RIFF files
+if ~isfield(Arg, 'readstdd') || isempty(Arg.readstdd)
+    Arg.readstdd = false;
+end
+
 % Empty EEG dataset
 try
     EEG = eeg_emptyset;
@@ -65,7 +72,7 @@ catch
 end
 
 % Open file
-[fid message] = fopen(fullfile(Arg.pathname, Arg.filename), 'r', 'l');
+[fid, message] = fopen(fullfile(Arg.pathname, Arg.filename), 'r', 'l');
 if fid == -1
     error(message)
 end
@@ -134,6 +141,10 @@ switch Arg.fileVers
         CNT.rawf.data.data = CNT.rawf.data.data(CNT.rawf.chan.index + 1, :);
         CNT.eeph.chanCalib = single(diag(CNT.eeph.chanCalib(:, 1) .* CNT.eeph.chanCalib(:, 2)));
         CNT.rawf.data.data = CNT.eeph.chanCalib * CNT.rawf.data.data;
+        if Arg.readstdd && isfield(CNT, 'stdd')
+            CNT.stdd.data = readcntriffdata(fid, CNT.stdd.data, CNT.eeph.channels, CNT.eeph.samples, CNT.stdd.ep.epochLength);
+            CNT.stdd.data.data = CNT.stdd.data.data(CNT.stdd.chan.index + 1, :);
+        end
 
         % Convert to EEGLAB EEG structure
         EEG.setname = CNT.eeph.conditionLabel;
@@ -142,6 +153,11 @@ switch Arg.fileVers
         EEG.srate = CNT.eeph.samplingRate;
         EEG.xmin = -CNT.eeph.prestimulus;
         EEG.data = CNT.rawf.data.data;
+        if Arg.readstdd && isfield(CNT, 'stdd')
+            EEG.stdd = CNT.stdd.data.data;
+        elseif Arg.readstdd
+            error('File does not contain standard deviation data.')
+        end
         [EEG.chanlocs(1:EEG.nbchan).labels] = deal(CNT.eeph.chanLabel{:});
         EEG.event.type = CNT.eeph.conditionLabel;
         EEG.event.trials = CNT.eeph.averagedTrials;
