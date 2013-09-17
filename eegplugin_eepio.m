@@ -33,7 +33,7 @@
 
 function vers = eegplugin_eepio(fig, trystrs, catchstrs)
 
-    vers = 'eepio0.3';
+    vers = 'eepio0.3.1';
     if nargin < 3
         error('eegplugin_eepio requires 3 arguments');
     end;
