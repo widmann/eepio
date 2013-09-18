@@ -9,8 +9,7 @@
 %   'filename'    - char array file name
 %   'pathname'    - char array path name {default '.'}
 %   'fileVers'    - scalar integer file format version {default 4}
-%   'readstdd'    - scalar boolean import stdd data (file format 4/RIFF
-%                   only) {default false}
+%   'readstdd'    - scalar boolean import stdd data {default false}
 %
 % Outputs:
 %   EEG           - EEGLAB EEG structure
@@ -125,7 +124,11 @@ switch Arg.fileVers
         EEG.data = zeros(EEG.nbchan, EEG.pnts);
         for iChan = 1:EEG.nbchan
             EEG.data(iChan, :) = fread(fid, EEG.pnts, 'float32');
-            fseek(fid, EEG.pnts * 4, 0); % stdd
+            if Arg.readstdd
+                EEG.stdd(iChan, :) = sqrt(fread(fid, EEG.pnts, 'float32'));
+            else
+                fseek(fid, EEG.pnts * 4, 0); % stdd
+            end
         end
         
         EEG.event.type = EEG.setname;
