@@ -156,7 +156,7 @@ switch Arg.filevers
 
         % Write data
         for iChan = 1:EEG.nbchan
-            fwrite(fid, [data(iChan, :) stdd(iChan, :)], 'float32');
+            fwrite(fid, [data(iChan, :) stdd(iChan, :).^2], 'float32');
         end
 
     % EEP 3.3-
